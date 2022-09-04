@@ -1,0 +1,13 @@
+*.dll
+*.exe
+*.pickle
+*.h5
+*.png
+*.*~
+*.*.swp
+darknet*.*
+tempCodeRunnerFile.py
+cfg
+data
+dataset
+yolocfg
