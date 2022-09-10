@@ -7,42 +7,25 @@ import pickle
 from PIL import Image, ImageOps
 
 
-""" Example : moves json ( creation by manual )
-{
-  "names": {
-    "Hadoken" : 1,
-    "Shoryuken" : 2,
-    "Tatsumaki Senpuu Kyaku" : 3
-  },
-  "Hadoken" : [    
-    63,75,
-    200,212],
-  "Shoryuken" : [    
-    49,58,
-    105,119],
-  "Tatsumaki Senpuu Kyaku" : [   
-    237,244,
-    695,708]
-}
-"""
-
-
-def creation_pickle(output, dataset_x, dataset_y):
+def creation_pickle(output, dataset_x, dataset_y, name_classes):
     dataset = dict()
     dataset['dataset_x'] = dataset_x
     dataset['dataset_y'] = dataset_y
+    dataset['name_classes'] = name_classes
     with open(output, 'wb') as handle:
         pickle.dump(dataset, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def image_resize(images, w, h):
+def image_resize_and_aug_horizontal(images, w, h, aug):
     images_list = []
+    images_list_aug = []
     for ix, im in enumerate(images):
         img = Image.open(im)
         img_resize = img.resize((w, h)) # Resize(of Fixed size) Image.LANCZOS
         img_arr = np.array(img_resize) # ImageOps.grayscale(img_resize)
         images_list.append(img_arr)
-    return np.array(images_list) / 255 # Data Normalization
+        if aug : images_list_aug.append(np.array(img_resize.transpose(Image.Transpose.FLIP_LEFT_RIGHT)))
+    return np.array(images_list) / 255, np.array(images_list_aug) / 255 # Data Normalization
     
         
 def make_moves_list(input_moves, dataset_class_name, dataset_index):
@@ -85,16 +68,25 @@ def main(args):
     print(dataset_index.shape)
     print(dataset_class_num, dataset_class_name)
         
-    # Load images to dataset with resizing 100 by 100
-    images_ndarry = image_resize(images, args.output_width, args.output_height)
+    # Load images to dataset with resizing width x height
+    re_images, re_images_aug = image_resize_and_aug_horizontal(images, 
+                                                               args.output_width, 
+                                                               args.output_height, 
+                                                               args.output_aug_horizontal)
     
     # Make time series data as 10 frame and classes are paired 
     # train_x : (#, step, img_w, img_h, img_channel) (#, 10, 100, 100, 3)
     # train_y : (#, step, moves of index)            (#, 10, 1)
-    dataset_x, dataset_y = make_time_series_data(images_ndarry, dataset_index, args.output_step)
+    dataset_x, dataset_y = make_time_series_data(re_images, dataset_index, args.output_step)
+    if args.output_aug_horizontal:
+        x_aug, y_aug = make_time_series_data(re_images_aug, dataset_index, args.output_step)
+        dataset_x = np.concatenate((dataset_x, x_aug), axis=0)
+        dataset_y = np.concatenate((dataset_y, y_aug), axis=0)
+        print("Data Augmentation", dataset_x.shape)
+        print("Data Augmentation", dataset_y.shape)
     
     # Create a pickle(or serialized) for dataset
-    creation_pickle(args.output, dataset_x, dataset_y)
+    creation_pickle(args.output, dataset_x, dataset_y, dataset_class_name)
 
 
 if __name__ == "__main__":
@@ -108,32 +100,38 @@ if __name__ == "__main__":
     parser.add_argument('--output_width', dest='output_width', type=int, default=100)
     parser.add_argument('--output_height', dest='output_height', type=int, default=100)
     parser.add_argument('--output_step', dest='output_step', type=int, default=10)
+    parser.add_argument('--output_aug_horizontal', dest='output_aug_horizontal', type=lambda s : s in ['True'], default=False)
     parser.add_argument('--output', dest='output', type=str, required=True)
     # ]]]
     
-    args = parser.parse_args()
+    #args = parser.parse_args()
     
-    """ Example
+    #""" Example
     args = parser.parse_args(['--input', './dataset/image_moves', 
                               '--input_moves', './dataset/image_moves/ken_moves.json',
-                              '--output', 'movesKen11.pickle'])
-    """
+                              '--output_width', '56',
+                              '--output_height', '56',
+                              '--output_aug_horizontal', 'True', 
+                              '--output', 'movesSF2.pickle'])
+    #"""
     main(args)
 
 
-
-"""
-import pickle
-
-your_data = {'foo': 'bar'}
-
-# Store data (serialize)
-with open('filename.pickle', 'wb') as handle:
-    pickle.dump(your_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-# Load data (deserialize)
-with open('filename.pickle', 'rb') as handle:
-    unserialized_data = pickle.load(handle)
-
-print(your_data == unserialized_data)
+""" Example : moves json ( creation by manual )
+{
+  "names": {
+    "Hadoken" : 1,
+    "Shoryuken" : 2,
+    "Tatsumaki Senpuu Kyaku" : 3
+  },
+  "Hadoken" : [    
+    63,75,
+    200,212],
+  "Shoryuken" : [    
+    49,58,
+    105,119],
+  "Tatsumaki Senpuu Kyaku" : [   
+    237,244,
+    695,708]
+}
 """
