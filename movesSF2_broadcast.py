@@ -13,15 +13,8 @@ import darknet_images
 from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
-
 import movesSF2_Util as util
 import movesSF2_Util_Yolo as util_yolo
-
-
-def PIL2OpenCV(pil_image):
-    numpy_image= np.array(pil_image)
-    opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
-    return opencv_image
 
 
 def main(args):
@@ -31,44 +24,35 @@ def main(args):
     # ]]]
 
     # [[[ load of pre-trained model as movesSF2
-    model = tf.keras.models.load_model('movesSF2.h5')
+    model = tf.keras.models.load_model(args.model)
     model_config = model.get_config()
     input_time_steps = model_config["layers"][0]["config"]["batch_input_shape"][1]
     input_image_size = model_config["layers"][0]["config"]["batch_input_shape"][2:]
     print("Input shape : ", model_config["layers"][0]["config"]["batch_input_shape"])
     # ]]]
     
-    
-    # time_steps_list   = util.make_image_list('./debugging/*.jpg')
-    # time_steps_imgs,_ = util.load_images(time_steps_list)
-    # time_steps_imgs   = util.make_time_series_data(time_steps_imgs, input_time_steps)
-    # print(time_steps_imgs.shape)
-    # print(time_steps_imgs[0][0])
-    
-       
     cv2.namedWindow('yolo', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('time-steps', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('time-steps-result', cv2.WINDOW_NORMAL)
     queue_crops = {}
     for key in args.output_class: 
         queue_crops[key] = [ np.empty(input_image_size) for i in range(input_time_steps)]
         cv2.namedWindow(key, cv2.WINDOW_NORMAL)
-        
-    cv2.namedWindow('time-steps', cv2.WINDOW_NORMAL)
-
-    count = 0
-    index = 0
+    
+    
     cap = cv2.VideoCapture(args.video)
     while(cap.isOpened()):
         ret, frame = cap.read()
         if ret != True: continue
         
-        # detecting using yolo
+        # detect objects using yolo
         image, detections = util_yolo.video_detection(frame, network, class_names, class_colors, args.threshold, args.draw_boxes )
         cv2.imshow('yolo', image)
 
-        # extracting detections to image file
+        # extract detections to images
         image_crop = util_yolo.video_crop(image, args.output_class, detections)
         
-        ken_image = None
+        # build time-steps images and show current image        
         for key in image_crop.keys():
             resize_img = cv2.resize(image_crop[key], dsize=input_image_size[:2])
             convert_img = cv2.cvtColor(resize_img, cv2.COLOR_BGR2RGB)
@@ -76,36 +60,26 @@ def main(args):
             queue_crops[key].append(convert_img)
             cv2.imshow(key, resize_img)                   
         
-        
-        # Inference 
+        # carry out inference        
         for key in args.model_class:
-            input = np.array(queue_crops[key]) / 255              
-            # input = time_steps_imgs[index % time_steps_imgs.shape[0]]/255
+            input = np.array(queue_crops[key]) / 255 
             result = model.predict(np.expand_dims(input, axis=0))
-            print("{:08d}".format(index), "predict :\t", np.argmax(result.squeeze(), axis=1))
-            index += 1
+            time_step_images = np.array(np.hstack(queue_crops[key][:]), dtype = np.uint8)
+    
+        # show time-step
+        if time_step_images is not None:     
+            cv2.imshow('time-steps', cv2.cvtColor(time_step_images, cv2.COLOR_RGB2BGR))
         
-
-        # if index == 155:
-        #     count = 0
-        #     for key in args.model_class:
-        #         for i, step in enumerate(queue_crops[key]):
-        #             cv2.imwrite('./debuging/ken' + str(count)+'.jpg', resize_img)
-        #             count += 1
-
-            
-        # showing output image after carrying out yolo
-        numpy_horizontal = None
-        for key in args.model_class: 
-            numpy_horizontal = np.array(np.hstack(queue_crops[key][:]), dtype = np.uint8)
-            numpy_horizontal = cv2.cvtColor(numpy_horizontal, cv2.COLOR_RGB2BGR)
-        #     numpy_horizontal = np.hstack(time_steps_imgs[index % time_steps_imgs.shape[0]][:])
-            # print(numpy_horizontal.shape)
-        
-        # numpy_horizontal = PIL2OpenCV(time_steps_imgs[index % time_steps_imgs.shape[0]][0])
-        if numpy_horizontal is not None:
-            cv2.imshow('time-steps', numpy_horizontal)
-
+        # show moves name
+        if result is not None:
+            frame_pos = '{:05} '.format(int(cap.get(cv2.CAP_PROP_POS_FRAMES)))
+            pannel = np.array(np.full(time_step_images.shape, 255), dtype = np.uint8)
+            pannel = cv2.putText(pannel, 
+                                 frame_pos + str(np.argmax(result.squeeze(), axis=1)), 
+                                 (0, int(time_step_images.shape[0]/2)), 
+                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+            cv2.imshow('time-steps-result', cv2.cvtColor(pannel, cv2.COLOR_RGB2BGR),)
+            cv2.setWindowTitle( 'time-steps-result', str(args.moves_name) ) 
 
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
 
@@ -131,6 +105,7 @@ if __name__ == "__main__":
     parser.add_argument('--draw_boxes',         dest='draw_boxes',         type=lambda s : s in ['True'], default=True)
     parser.add_argument('--output_class',       dest='output_class',       type=lambda s: s.split(','))
     parser.add_argument('--model_class',        dest='model_class',        type=lambda s: s.split(','))
+    parser.add_argument('--moves_name',         dest='moves_name',         type=lambda s: s.split(','))
     # ]]]
     
     # args = parser.parse_args()
@@ -141,7 +116,8 @@ if __name__ == "__main__":
                               '--print_fps', 'True',
                               '--model', './movesSF2.h5',
                               '--output_class', 'ken_a,zangief_a',
-                              '--model_class', 'ken_a'])
+                              '--model_class', 'ken_a',
+                              '--moves_name', 'None,Hadoken,Shoryuken,Tatsumaki Senpuu Kyaku'])
     #"""
     main(args)
-
+    
