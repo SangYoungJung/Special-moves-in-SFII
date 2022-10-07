@@ -14,8 +14,8 @@ from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 
-import movesSF2_Util as util
-import movesSF2_Util_Yolo as util_yolo
+import movesSF2_util as util
+import movesSF2_util_yolo as util_yolo
 
 
 def PIL2OpenCV(pil_image):

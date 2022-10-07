@@ -1,7 +1,7 @@
 import glob
 import argparse
 import numpy as np
-import movesSF2_Util as util
+import movesSF2_util as util
 
 
 """ main function
