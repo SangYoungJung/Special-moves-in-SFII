@@ -51,13 +51,13 @@ def make_moves_list(input_moves, dataset_class_name, dataset_index):
                 dataset_index[even:odd+1] = class_number
 
 
-def make_time_series_data(images_ndarry, dataset_index, step):
-    dataset_x = make_time_series_data(images_ndarry, step)
+def make_time_series_data_xy(images_ndarry, dataset_index, step):
+    dataset_x = make_time_series_data_x(images_ndarry, step)
     dataset_y = np.array([dataset_index[i:i+step] for i in range(dataset_index.shape[0]-step)])
     return dataset_x, dataset_y
 
 
-def make_time_series_data(images_ndarry, step):
+def make_time_series_data_x(images_ndarry, step):
     dataset_x = np.array([images_ndarry[i:i+step] for i in range(images_ndarry.shape[0]-step)])
     dataset_x = dataset_x.reshape(dataset_x.shape[0], 
                                 dataset_x.shape[1], 
