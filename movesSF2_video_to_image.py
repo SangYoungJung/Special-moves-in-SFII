@@ -44,8 +44,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     """ Example
-    args = parser.parse_args(['--video', './dataset/video/2022-07-14-21-05-17.mp4', 
-                              '--output_location', './dataset/image1'])
+    args = parser.parse_args(['--video', './dataset/videos/ken_vs_zangief.mp4', 
+                              '--output_location', './dataset/temp'])
     """
     main(args)
     
