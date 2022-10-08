@@ -1,0 +1,6 @@
+classes= 5
+train  = yolocfg/moves-sf2-train.txt
+valid  = yolocfg/moves-sf2-valid.txt
+names = yolocfg/moves-sf2.names
+backup = yolocfg/result/
+
