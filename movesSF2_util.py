@@ -1,8 +1,10 @@
 import pickle
-from PIL import Image, ImageOps
 import numpy as np
 import json
 import glob
+import cv2
+from PIL import Image, ImageOps
+
 
 """ Creation Functions
 """
@@ -66,3 +68,10 @@ def make_time_series_data_x(images_ndarry, step):
                                 dataset_x.shape[4]) 
     return dataset_x
 
+
+""" Image Processing
+"""
+def pil_to_cv2(pil_image):
+    numpy_image= np.array(pil_image)
+    opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
+    return opencv_image
