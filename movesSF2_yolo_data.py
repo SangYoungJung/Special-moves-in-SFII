@@ -16,10 +16,14 @@ if __name__ == "__main__":
     load_data.download('https://drive.google.com/uc?id=' + '1xQsP0HJ61AZzdKQZkWpObEECGjfcXplw', 
                        './yolocfg/yolov3-tiny.weights')
     
-    # 2. Load images
+    # 2. Download the moves SF2 weight file of yolo
+    load_data.download('https://drive.google.com/uc?id=' + '1DvdjAOgwXv4gzDn-wIbHux4BHcARZo-P', 
+                       './yolocfg/yolov3-tiny_final_sf2.weights')
+    
+    # 3. Load images
     files = sorted(glob.glob(args.pathname))
     
-    # 3. Split dataset into train and valid
+    # 4. Split dataset into train and valid
     train_save = './yolocfg/moves-sf2-train.txt'
     valid_save = './yolocfg/moves-sf2-valid.txt'
     
@@ -30,11 +34,11 @@ if __name__ == "__main__":
     train = index[0:int(len(files) * 0.8)]
     valid = index[len(train):]
 
-    # 4. Create a train 
+    # 5. Create a train 
     with open(train_save, 'w') as f:
         for ii in train: f.write(files[ii] + "\n")
 
-    # 5. Create a valid
+    # 6. Create a valid
     with open(valid_save, 'w') as f:
         for jj in valid: f.write(files[jj] + "\n")
     
