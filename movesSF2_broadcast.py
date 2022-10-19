@@ -18,6 +18,17 @@ import movesSF2_util as util
 import movesSF2_util_yolo as util_yolo
 
 
+def moves_name(moves_num):
+    return 'Hadoken' if moves_num == 1 else 'Shoryuken' if moves_num == 2 else 'Tatsumaki' if moves_num == 3 else ''
+
+def moves_judgement(result, judgement_per_frame):
+    continuous = 0
+    prev_moves_num = result[-1]
+    for moves_num in np.flip(result):
+        if prev_moves_num == moves_num: continuous += 1
+        if continuous >= judgement_per_frame: return moves_name(moves_num)
+    return moves_name(0)
+
 def main(args):
     # [[[ configuration for darknet
     random.seed(3)  # deterministic bbox colors
@@ -53,7 +64,7 @@ def main(args):
         
         # Frame Per Inference
         count += 1
-        if count % args.frame_per_inference != 0 : continue
+        if count % args.inference_per_frame != 0 : continue
 
         # extracting detections to image file
         image_crop = util_yolo.video_crop(image, args.output_class, detections)
@@ -66,12 +77,13 @@ def main(args):
             queue_crops[key].append(convert_img)
             cv2.imshow(key, resize_img)                   
         
-        
         # Inference 
+        argmax_result = np.zeros(input_time_steps)
         for key in args.model_class:
             input = np.array(queue_crops[key]) / 255              
             result = model.predict(np.expand_dims(input, axis=0))
-            print("{:08d}".format(index), "predict :\t", np.argmax(result.squeeze(), axis=1))
+            argmax_result = np.argmax(result.squeeze(), axis=1)
+            print("{:08d}".format(index), "predict :\t", argmax_result)
             index += 1
         
         # showing output image after carrying out yolo
@@ -81,9 +93,15 @@ def main(args):
             numpy_horizontal = cv2.cvtColor(numpy_horizontal, cv2.COLOR_RGB2BGR)
         
         if numpy_horizontal is not None:
+            judgement = moves_judgement(argmax_result, args.judgement_per_frame)
+            textsize = cv2.getTextSize(judgement, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            textX = (numpy_horizontal.shape[1] - textsize[0]) / 2
+            textY = (numpy_horizontal.shape[0] + textsize[1]) / 2
+            numpy_horizontal = cv2.putText(numpy_horizontal, judgement, (int(textX), int(textY)), 
+                                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA).copy()
             cv2.imshow('time-steps', numpy_horizontal)
 
-
+        # Quit
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
 
     cap.release()
@@ -108,7 +126,8 @@ if __name__ == "__main__":
     parser.add_argument('--draw_boxes',         dest='draw_boxes',         type=lambda s : s in ['True'], default=True)
     parser.add_argument('--output_class',       dest='output_class',       type=lambda s: s.split(','))
     parser.add_argument('--model_class',        dest='model_class',        type=lambda s: s.split(','))
-    parser.add_argument('--frame_per_inference',dest='frame_per_inference',type=int, default=1)
+    parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
+    parser.add_argument('--judgement_per_frame',dest='judgement_per_frame',type=int, default=5)
     # ]]]
     
     # args = parser.parse_args()
@@ -120,7 +139,8 @@ if __name__ == "__main__":
                               '--model', './movesSF2.h5',
                               '--output_class', 'ken_a,zangief_a',
                               '--model_class', 'ken_a',
-                              '--frame_per_inference', '3'])
+                              '--inference_per_frame', '3',
+                              '--judgement_per_frame', '3'])
     #"""
     main(args)
 
