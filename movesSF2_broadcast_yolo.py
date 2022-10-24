@@ -16,18 +16,9 @@ from tensorflow import keras
 
 import movesSF2_util as util
 import movesSF2_util_yolo as util_yolo
+import movesSF2_util_model as util_model
 
 
-def moves_name(moves_num):
-    return 'Hadoken' if moves_num == 1 else 'Shoryuken' if moves_num == 2 else 'Tatsumaki' if moves_num == 3 else ''
-
-def moves_judgement(result, judgement_per_frame):
-    continuous = 0
-    prev_moves_num = result[-1]
-    for moves_num in np.flip(result):
-        if prev_moves_num == moves_num: continuous += 1
-        if continuous >= judgement_per_frame: return moves_name(moves_num)
-    return moves_name(0)
 
 def main(args):
     # [[[ configuration for darknet
@@ -35,28 +26,27 @@ def main(args):
     network, class_names, class_colors = darknet.load_network( args.config, args.data, args.weights, batch_size=1 )
     # ]]]
 
-    # [[[ load of pre-trained model as movesSF2
-    model = tf.keras.models.load_model('movesSF2.h5')
-    model_config = model.get_config()
-    input_time_steps = model_config["layers"][0]["config"]["batch_input_shape"][1]
-    input_image_size = model_config["layers"][0]["config"]["batch_input_shape"][2:]
-    print("Input shape : ", model_config["layers"][0]["config"]["batch_input_shape"])
+    # [[[ load pre-trained model as movesSF2
+    model, input_time_steps, input_image_size = util_model.load_model(args.model)
     # ]]]
     
     cv2.namedWindow('yolo', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('time-steps', cv2.WINDOW_NORMAL)
     queue_crops = {}
     for key in args.output_class: 
         queue_crops[key] = [ np.empty(input_image_size) for i in range(input_time_steps)]
         cv2.namedWindow(key, cv2.WINDOW_NORMAL)
-        
-    cv2.namedWindow('time-steps', cv2.WINDOW_NORMAL)
 
     count = 0
     index = 0
     cap = cv2.VideoCapture(args.video)
     while(cap.isOpened()):
+        # Read a frame
         ret, frame = cap.read()
         if ret != True: break
+        
+        # Horizontal Flip
+        if args.video_flip: frame = cv2.flip(frame, 1) 
         
         # detecting using yolo
         image, detections = util_yolo.video_detection(frame, network, class_names, class_colors, args.threshold, args.draw_boxes )
@@ -69,7 +59,6 @@ def main(args):
         # extracting detections to image file
         image_crop = util_yolo.video_crop(image, args.output_class, detections)
         
-        ken_image = None
         for key in image_crop.keys():
             resize_img = cv2.resize(image_crop[key], dsize=input_image_size[:2])
             convert_img = cv2.cvtColor(resize_img, cv2.COLOR_BGR2RGB)
@@ -78,28 +67,14 @@ def main(args):
             cv2.imshow(key, resize_img)                   
         
         # Inference 
-        argmax_result = np.zeros(input_time_steps)
-        for key in args.model_class:
-            input = np.array(queue_crops[key]) / 255              
-            result = model.predict(np.expand_dims(input, axis=0))
-            argmax_result = np.argmax(result.squeeze(), axis=1)
-            print("{:08d}".format(index), "predict :\t", argmax_result)
-            index += 1
+        argmax_result = util_model.inference(model, queue_crops[args.model_class])
+        print("{:08d}".format(index), "predict :\t", argmax_result)
+        index += 1
         
         # showing output image after carrying out yolo
-        numpy_horizontal = None
-        for key in args.model_class: 
-            numpy_horizontal = np.array(np.hstack(queue_crops[key][:]), dtype = np.uint8)
-            numpy_horizontal = cv2.cvtColor(numpy_horizontal, cv2.COLOR_RGB2BGR)
-        
-        if numpy_horizontal is not None:
-            judgement = moves_judgement(argmax_result, args.judgement_per_frame)
-            textsize = cv2.getTextSize(judgement, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-            textX = (numpy_horizontal.shape[1] - textsize[0]) / 2
-            textY = (numpy_horizontal.shape[0] + textsize[1]) / 2
-            numpy_horizontal = cv2.putText(numpy_horizontal, judgement, (int(textX), int(textY)), 
-                                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA).copy()
-            cv2.imshow('time-steps', numpy_horizontal)
+        numpy_horizontal = util_model.inference_summary(queue_crops[args.model_class], argmax_result, args.judgement_per_frame)
+
+        cv2.imshow('time-steps', numpy_horizontal)
 
         # Quit
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
@@ -117,6 +92,7 @@ if __name__ == "__main__":
     parser.add_argument('--threshold',  dest='threshold',   type=float, default=0.25)
     parser.add_argument('--video',      dest='video',       type=str,   required=True)
     parser.add_argument('--model',      dest='model',       type=str,   required=True)
+    parser.add_argument('--video_flip', dest='video_flip',  type=lambda s : s in ['True'], default=False)
     # ]]]
     
     # [[[ Ouput arguments for Yolo and movesSF2
@@ -125,7 +101,7 @@ if __name__ == "__main__":
     parser.add_argument('--print_fps',          dest='print_fps',          type=lambda s : s in ['True'], default=True)
     parser.add_argument('--draw_boxes',         dest='draw_boxes',         type=lambda s : s in ['True'], default=True)
     parser.add_argument('--output_class',       dest='output_class',       type=lambda s: s.split(','))
-    parser.add_argument('--model_class',        dest='model_class',        type=lambda s: s.split(','))
+    parser.add_argument('--model_class',        dest='model_class',        type=str)
     parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
     parser.add_argument('--judgement_per_frame',dest='judgement_per_frame',type=int, default=5)
     # ]]]
@@ -134,6 +110,7 @@ if __name__ == "__main__":
     
     #""" Example
     args = parser.parse_args(['--video', './dataset/videos/ken_vs_zangief.mp4', 
+                              '--video_flip', 'True',
                               '--draw_boxes', 'False',
                               '--print_fps', 'True',
                               '--model', './movesSF2.h5',
