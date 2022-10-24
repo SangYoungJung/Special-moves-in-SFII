@@ -110,10 +110,10 @@ if __name__ == "__main__":
     
     #""" Example
     args = parser.parse_args(['--video', './dataset/videos/ken_vs_zangief.mp4', 
-                              '--video_flip', 'True',
+                              '--video_flip', 'False',
                               '--draw_boxes', 'False',
                               '--print_fps', 'True',
-                              '--model', './movesSF2.h5',
+                              '--model', './movesSF2_pre_trained.h5',
                               '--output_class', 'ken_a,zangief_a',
                               '--model_class', 'ken_a',
                               '--inference_per_frame', '3',
