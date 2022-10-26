@@ -1,5 +1,7 @@
+""" Import libraries
+""" 
 import os
-os.add_dll_directory('c:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/bin')
+os.add_dll_directory(os.environ['CUDA_PATH'] + '/bin') # For darknet with CUDA
 os.add_dll_directory(os.getcwd())
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -19,7 +21,8 @@ import movesSF2_util_yolo as util_yolo
 import movesSF2_util_model as util_model
 
 
-
+""" Functions
+"""
 def main(args):
     # [[[ configuration for darknet
     random.seed(3)  # deterministic bbox colors
@@ -48,17 +51,19 @@ def main(args):
         # Horizontal Flip
         if args.video_flip: frame = cv2.flip(frame, 1) 
         
-        # detecting using yolo
-        image, detections = util_yolo.video_detection(frame, network, class_names, class_colors, args.threshold, args.draw_boxes )
+        # Detection using yolo
+        image, detections = util_yolo.video_detection(frame, network, class_names, class_colors, 
+                                                      args.threshold, args.draw_boxes )
         cv2.imshow('yolo', image)
         
-        # Frame Per Inference
+        # Inference per frame times
         count += 1
         if count % args.inference_per_frame != 0 : continue
 
         # extracting detections to image file
         image_crop = util_yolo.video_crop(image, args.output_class, detections)
         
+        # Collect input time-step images as 10 frames
         for key in image_crop.keys():
             resize_img = cv2.resize(image_crop[key], dsize=input_image_size[:2])
             convert_img = cv2.cvtColor(resize_img, cv2.COLOR_BGR2RGB)
@@ -71,9 +76,11 @@ def main(args):
         print("{:08d}".format(index), "predict :\t", argmax_result)
         index += 1
         
-        # showing output image after carrying out yolo
-        numpy_horizontal = util_model.inference_summary(queue_crops[args.model_class], argmax_result, args.judgement_per_frame)
-
+        # Show output image
+        numpy_horizontal = util_model.inference_summary(queue_crops[args.model_class], 
+                                                        argmax_result, 
+                                                        args.judgement_time_step,
+                                                        'left')
         cv2.imshow('time-steps', numpy_horizontal)
 
         # Quit
@@ -83,6 +90,8 @@ def main(args):
     cv2.destroyAllWindows()
 
 
+""" Main
+"""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
@@ -103,7 +112,7 @@ if __name__ == "__main__":
     parser.add_argument('--output_class',       dest='output_class',       type=lambda s: s.split(','))
     parser.add_argument('--model_class',        dest='model_class',        type=str)
     parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
-    parser.add_argument('--judgement_per_frame',dest='judgement_per_frame',type=int, default=5)
+    parser.add_argument('--judgement_time_step',dest='judgement_time_step',type=int, default=5)
     # ]]]
     
     # args = parser.parse_args()
@@ -117,7 +126,7 @@ if __name__ == "__main__":
                               '--output_class', 'ken_a,zangief_a',
                               '--model_class', 'ken_a',
                               '--inference_per_frame', '3',
-                              '--judgement_per_frame', '3'])
+                              '--judgement_time_step', '3'])
     #"""
     main(args)
 

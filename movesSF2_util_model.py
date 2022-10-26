@@ -1,17 +1,22 @@
+import os
 import numpy as np
 import cv2
 import tensorflow as tf
 from tensorflow import keras
 
+def gpu_support():
+    print("physical_devices :", tf.config.list_physical_devices('GPU'))
+    print("gpu support :", tf.test.is_built_with_gpu_support())
+
 def name(moves_num):
     return 'Hadoken' if moves_num == 1 else 'Shoryuken' if moves_num == 2 else 'Tatsumaki' if moves_num == 3 else ''
 
-def judgement(result, judgement_per_frame):
+def judgement(result, judgement_time_step):
     continuous = 0
     prev_moves_num = result[-1]
     for moves_num in np.flip(result):
         if prev_moves_num == moves_num: continuous += 1
-        if continuous >= judgement_per_frame: return name(moves_num)
+        if continuous >= judgement_time_step: return name(moves_num)
     return name(0)
 
 def load_model(name):
@@ -29,14 +34,15 @@ def inference(model, time_step_input):
     argmax_result = np.argmax(result.squeeze(), axis=1)
     return argmax_result
 
-def inference_summary(time_step_input, argmax_result, judgement_per_frame):
+def inference_summary(time_step_input, argmax_result, judgement_time_step, text_align='left'):
     # showing output image after carrying out yolo
     numpy_horizontal = np.array(np.hstack(time_step_input[:]), dtype = np.uint8)
     numpy_horizontal = cv2.cvtColor(numpy_horizontal, cv2.COLOR_RGB2BGR)
     
-    ret = judgement(argmax_result, judgement_per_frame)
+    ret = judgement(argmax_result, judgement_time_step)
     textsize = cv2.getTextSize(ret, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-    textX = (numpy_horizontal.shape[1] - textsize[0]) / 2
+    align_offset = 1 if text_align == 'left' else 2 if text_align == 'center' else 10e3
+    textX = (numpy_horizontal.shape[1] - textsize[0]) / align_offset
     textY = (numpy_horizontal.shape[0] + textsize[1]) / 2
     numpy_horizontal = cv2.putText(numpy_horizontal, ret, (int(textX), int(textY)), 
                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA).copy()

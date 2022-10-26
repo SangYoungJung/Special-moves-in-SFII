@@ -1,6 +1,6 @@
+""" Import libraries
+""" 
 import os
-os.add_dll_directory('c:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/bin')
-os.add_dll_directory(os.getcwd())
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import cv2
@@ -17,7 +17,8 @@ import movesSF2_util as util
 import movesSF2_util_model as util_model
 
 
-
+""" Functions
+"""
 def main(args):
     # [[[ load pre-trained model as movesSF2
     model, input_time_steps, input_image_size = util_model.load_model(args.model)
@@ -27,7 +28,6 @@ def main(args):
     queue_crops[args.output_class] = [ np.empty(input_image_size) for i in range(input_time_steps)]
     cv2.namedWindow(args.output_class, cv2.WINDOW_NORMAL)
     cv2.namedWindow('time-steps', cv2.WINDOW_NORMAL)
-  
     
     count = 0
     index = 0
@@ -41,11 +41,12 @@ def main(args):
         
         # Show Frame
         cv2.imshow(args.output_class, frame)
-                
-        # Frame Per Inference
+        
+        # Inference per frame times            
         count += 1
         if count % args.inference_per_frame != 0 : continue
         
+        # Collect input time-step images as 10 frames
         resize_img = cv2.resize(frame, dsize=input_image_size[:2])
         convert_img = cv2.cvtColor(resize_img, cv2.COLOR_BGR2RGB)
         queue_crops[args.model_class].pop(0)
@@ -56,16 +57,21 @@ def main(args):
         print("{:08d}".format(index), "predict :\t", argmax_result)
         index += 1
         
-        # showing output image after carrying out yolo
-        numpy_horizontal = util_model.inference_summary(queue_crops[args.model_class], argmax_result, args.judgement_per_frame)
+        # Show output image
+        numpy_horizontal = util_model.inference_summary(queue_crops[args.model_class], 
+                                                        argmax_result, 
+                                                        args.judgement_time_step,
+                                                        'left')
         cv2.imshow('time-steps', numpy_horizontal)
         
-         # Quit
+        # Quit
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
 
     cv2.destroyAllWindows()
 
 
+""" Main
+"""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
@@ -78,7 +84,7 @@ if __name__ == "__main__":
     parser.add_argument('--output_class',       dest='output_class',       type=str)
     parser.add_argument('--model_class',        dest='model_class',        type=str)
     parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
-    parser.add_argument('--judgement_per_frame',dest='judgement_per_frame',type=int, default=5)
+    parser.add_argument('--judgement_time_step',dest='judgement_time_step',type=int, default=3)
     # ]]]
     
     # args = parser.parse_args()
@@ -90,7 +96,7 @@ if __name__ == "__main__":
                               '--output_class', 'ken_a',
                               '--model_class', 'ken_a',
                               '--inference_per_frame', '1',
-                              '--judgement_per_frame', '3'])
+                              '--judgement_time_step', '3'])
     #"""
     main(args)
 

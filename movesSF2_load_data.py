@@ -46,7 +46,7 @@ if __name__ == "__main__":
     downloads.append(dataset_dir + '/yolo_image_dataset.zip')
     downloads.append(dataset_dir + '/time_series_image_dataset.zip')
     downloads.append(dataset_dir + '/yolo_video.zip')
-    downloads.append(current_dir + '/movesSF2_pre_trained.hd5')
+    downloads.append(current_dir + '/movesSF2_pre_trained.h5')
     
     outputs = []
     outputs.append(dataset_dir + '/images')
