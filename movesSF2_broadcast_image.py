@@ -91,7 +91,7 @@ if __name__ == "__main__":
     
     #""" Example
     args = parser.parse_args(['--image', './dataset/images_moves', 
-                              '--image_flip', 'False',
+                              '--image_flip', 'True',
                               '--model', './movesSF2_pre_trained.h5',
                               '--output_class', 'ken_a',
                               '--model_class', 'ken_a',

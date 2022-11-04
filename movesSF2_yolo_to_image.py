@@ -56,9 +56,10 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
-    parser.add_argument('--config',     dest='config',      type=str,   default='./yolocfg/yolov3-tiny-test.cfg')
+    parser.add_argument('--config',     dest='config',      type=str,   default='./yolocfg/yolov3-tiny-test-moves-sf2.cfg')
     parser.add_argument('--data',       dest='data',        type=str,   default='./yolocfg/moves-sf2.data')
-    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolocfg/result/yolov3-tiny_final.weights')
+    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolocfg/yolov3-tiny_finaly-moves-sf2.weights')
+    
     parser.add_argument('--threshold',  dest='threshold',   type=float, default=0.25)
     parser.add_argument('--video',      dest='video',       type=str,   required=True)
     # ]]]

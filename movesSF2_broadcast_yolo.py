@@ -95,9 +95,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
-    parser.add_argument('--config',     dest='config',      type=str,   default='./yolocfg/yolov3-tiny-test.cfg')
+    parser.add_argument('--config',     dest='config',      type=str,   default='./yolocfg/yolov3-tiny-test-moves-sf2.cfg')
     parser.add_argument('--data',       dest='data',        type=str,   default='./yolocfg/moves-sf2.data')
-    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolocfg/result/yolov3-tiny_final_sf2.weights')
+    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolocfg/yolov3-tiny_finaly-moves-sf2.weights')
     parser.add_argument('--threshold',  dest='threshold',   type=float, default=0.25)
     parser.add_argument('--video',      dest='video',       type=str,   required=True)
     parser.add_argument('--model',      dest='model',       type=str,   required=True)
@@ -111,8 +111,8 @@ if __name__ == "__main__":
     parser.add_argument('--draw_boxes',         dest='draw_boxes',         type=lambda s : s in ['True'], default=True)
     parser.add_argument('--output_class',       dest='output_class',       type=lambda s: s.split(','))
     parser.add_argument('--model_class',        dest='model_class',        type=str)
-    parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
-    parser.add_argument('--judgement_time_step',dest='judgement_time_step',type=int, default=5)
+    parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=3)
+    parser.add_argument('--judgement_time_step',dest='judgement_time_step',type=int, default=3)
     # ]]]
     
     # args = parser.parse_args()
