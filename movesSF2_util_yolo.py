@@ -42,4 +42,16 @@ def video_crop(img, class_name, detections):
     return crop
 
 
+def convert_original_frame(image, bbox, darkent_height, darknet_width):
+    x, y, w, h = bbox
+    x, y, w, h = x/darknet_width, y/darkent_height, w/darknet_width, h/darkent_height
 
+    image_h, image_w, __ = image.shape
+
+    orig_x       = int(x * image_w)
+    orig_y       = int(y * image_h)
+    orig_width   = int(w * image_w)
+    orig_height  = int(h * image_h)
+
+    bbox_converted = (orig_x, orig_y, orig_width, orig_height)
+    return bbox_converted

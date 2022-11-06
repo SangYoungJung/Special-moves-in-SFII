@@ -14,11 +14,11 @@ if __name__ == "__main__":
     
     # 1. Download a weight file of yolo
     load_data.download('https://drive.google.com/uc?id=' + '1xQsP0HJ61AZzdKQZkWpObEECGjfcXplw', 
-                       './yolocfg/yolov3-tiny.weights')
+                       './yolov3-tiny.weights')
     
     # 2. Download the moves SF2 weight file of yolo
     load_data.download('https://drive.google.com/uc?id=' + '1DvdjAOgwXv4gzDn-wIbHux4BHcARZo-P', 
-                       './yolocfg/yolov3-tiny_final_sf2.weights')
+                       './yolov3-tiny-final-sf2.weights')
     
     # 3. Load images
     files = sorted(glob.glob(args.pathname))

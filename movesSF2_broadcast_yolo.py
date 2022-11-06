@@ -27,6 +27,8 @@ def main(args):
     # [[[ configuration for darknet
     random.seed(3)  # deterministic bbox colors
     network, class_names, class_colors = darknet.load_network( args.config, args.data, args.weights, batch_size=1 )
+    darknet_width = darknet.network_width(network)
+    darknet_height = darknet.network_height(network)
     # ]]]
 
     # [[[ load pre-trained model as movesSF2
@@ -53,14 +55,22 @@ def main(args):
         
         # Detection using yolo
         image, detections = util_yolo.video_detection(frame, network, class_names, class_colors, 
-                                                      args.threshold, args.draw_boxes )
-        cv2.imshow('yolo', image)
+                                                      args.threshold, False )
+        # Yolo's detection to original frame
+        detections_adjusted = [ ]
+        if args.draw_boxes: 
+            for label, confidence, bbox in detections:
+                bbox_adjusted = util_yolo.convert_original_frame(frame, bbox, darknet_height, darknet_width)
+                detections_adjusted.append((str(label), confidence, bbox_adjusted))
+            frame = darknet.draw_boxes(detections_adjusted, frame, class_colors)
+        cv2.imshow('yolo', frame)    
         
         # Inference per frame times
         count += 1
         if count % args.inference_per_frame != 0 : continue
 
         # extracting detections to image file
+        # Note : RNN's input data is a detected and cropped image from resized yolo's input image. 
         image_crop = util_yolo.video_crop(image, args.output_class, detections)
         
         # Collect input time-step images as 10 frames
@@ -82,6 +92,9 @@ def main(args):
                                                         args.judgement_time_step,
                                                         'left')
         cv2.imshow('time-steps', numpy_horizontal)
+        
+        # Show FPS
+        if args.print_fps : util.fps_show()
 
         # Quit
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
@@ -97,7 +110,7 @@ if __name__ == "__main__":
     # [[[ Input arguments
     parser.add_argument('--config',     dest='config',      type=str,   default='./yolocfg/yolov3-tiny-test-moves-sf2.cfg')
     parser.add_argument('--data',       dest='data',        type=str,   default='./yolocfg/moves-sf2.data')
-    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolocfg/yolov3-tiny_finaly-moves-sf2.weights')
+    parser.add_argument('--weights',    dest='weights',     type=str,   default='./yolov3-tiny-final-sf2.weights')
     parser.add_argument('--threshold',  dest='threshold',   type=float, default=0.25)
     parser.add_argument('--video',      dest='video',       type=str,   required=True)
     parser.add_argument('--model',      dest='model',       type=str,   required=True)
@@ -120,7 +133,7 @@ if __name__ == "__main__":
     #""" Example
     args = parser.parse_args(['--video', './dataset/videos/ken_vs_zangief.mp4', 
                               '--video_flip', 'False',
-                              '--draw_boxes', 'False',
+                              '--draw_boxes', 'True',
                               '--print_fps', 'True',
                               '--model', './movesSF2_pre_trained.h5',
                               '--output_class', 'ken_a,zangief_a',

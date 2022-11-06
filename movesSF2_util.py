@@ -1,4 +1,5 @@
 import pickle
+import time
 import numpy as np
 import json
 import glob
@@ -75,3 +76,17 @@ def pil_to_cv2(pil_image):
     numpy_image= np.array(pil_image)
     opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
     return opencv_image
+
+
+""" Util
+"""
+fps_start_time = time.time()
+fps_counter = 0
+def fps_show(per_second=1):
+    global fps_start_time
+    global fps_counter
+    fps_counter+=1
+    if (time.time() - fps_start_time) >= per_second :
+        print("FPS: ", fps_counter / (time.time() - fps_start_time))
+        fps_counter = 0
+        fps_start_time = time.time()
