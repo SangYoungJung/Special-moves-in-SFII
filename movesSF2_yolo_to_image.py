@@ -9,7 +9,7 @@ import argparse
 import darknet
 import darknet_images
 from datetime import datetime
-import movesSF2_util_yolo as util_yolo
+import util.movesSF2_util_yolo as util_yolo
 
 
 def main(args):
