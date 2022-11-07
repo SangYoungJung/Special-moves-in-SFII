@@ -13,8 +13,8 @@ from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 
-import movesSF2_util as util
-import movesSF2_util_model as util_model
+import util.movesSF2_util as util
+import util.movesSF2_util_model as util_model
 
 
 """ Functions

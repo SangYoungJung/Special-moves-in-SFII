@@ -1,7 +1,6 @@
 import glob
 import numpy as np
 import argparse
-import movesSF2_load_data as load_data
 
 
 """ main fucntion
@@ -12,18 +11,10 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=1001)
     args = parser.parse_args()
     
-    # 1. Download a weight file of yolo
-    load_data.download('https://drive.google.com/uc?id=' + '1xQsP0HJ61AZzdKQZkWpObEECGjfcXplw', 
-                       './yolov3-tiny.weights')
-    
-    # 2. Download the moves SF2 weight file of yolo
-    load_data.download('https://drive.google.com/uc?id=' + '1DvdjAOgwXv4gzDn-wIbHux4BHcARZo-P', 
-                       './yolov3-tiny-final-sf2.weights')
-    
-    # 3. Load images
+    # 1. Load images
     files = sorted(glob.glob(args.pathname))
     
-    # 4. Split dataset into train and valid
+    # 2. Split dataset into train and valid
     train_save = './yolocfg/moves-sf2-train.txt'
     valid_save = './yolocfg/moves-sf2-valid.txt'
     
@@ -34,11 +25,11 @@ if __name__ == "__main__":
     train = index[0:int(len(files) * 0.8)]
     valid = index[len(train):]
 
-    # 5. Create a train 
+    # 3. Create a train 
     with open(train_save, 'w') as f:
         for ii in train: f.write(files[ii] + "\n")
 
-    # 6. Create a valid
+    # 4. Create a valid
     with open(valid_save, 'w') as f:
         for jj in valid: f.write(files[jj] + "\n")
     
