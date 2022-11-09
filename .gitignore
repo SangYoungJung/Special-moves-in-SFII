@@ -5,9 +5,14 @@
 *.png
 *.*~
 *.*.swp
+*.weights
 darknet*.*
 tempCodeRunnerFile.py
 cfg
 data
 dataset
 yolocfg
+.ipynb_checkpoints
+.vscode
+__pycache__
+util/__pycache__
