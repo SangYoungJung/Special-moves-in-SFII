@@ -1,10 +1,12 @@
 # Special moves SF2 recognition with YOLO + RNN
-<img src="./main.png" title="Logo"/>
+<img src="https://i.imgur.com/hOkH8Kz.png" title="Logo"/>
 
-This is a broadcasting model and tiny tool for SF2 but moves Ken only. This is 2-stage model. First, YOLO detects characters of SF2 and feeds detected images to moves-RNN's. Second, moves-RNN's performs special moves SF2 recognition.  
-1. Object Detection YOLOv3 with Tiny weights
-2. Recognition moves RNNs with deep many to one 
+This is a broadcasting model and tiny tool for Street Fighter2.  
+First, YOLO detects characters of SF2 and feeds detected images to moves-RNN's. Second, moves-RNN's performs special moves SF2 recognition.  
+1. Object Detection **YOLOv3** with Tiny weights
+2. Recognition moves **RNNs** with deep many to many with ConvLSTM2D 
 
+<img src="https://i.imgur.com/7QTjsLl.png" title="architecture"/>
 
 ### Spcial moves in SF2 for Ken only
 * Hadoken
@@ -27,6 +29,5 @@ This is a broadcasting model and tiny tool for SF2 but moves Ken only. This is 2
 
 ### To do 
 - [ ] All characters and moves in SF2 is applied. 
-- [ ] Supports others implemented YOLO in Tensorflow/PyTorch 
 - [ ] Supports PyTorch
 - [ ] Unified Tool or App
