@@ -90,3 +90,11 @@ def fps_show(per_second=1):
         print("FPS: ", fps_counter / (time.time() - fps_start_time))
         fps_counter = 0
         fps_start_time = time.time()
+
+
+def video_information(vidcap):
+    print('Frame width:', int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH)))
+    print('Frame height:', int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    print('Frame count:', int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT)))
+    print('FPS:',int(vidcap.get(cv2.CAP_PROP_FPS)))
+    return int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
