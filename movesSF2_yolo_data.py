@@ -1,10 +1,23 @@
+#===============================================================================
+#
+#   File name   : movesSF2_yolo_data.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : shuffle train and valid dataset using seed and random of numpy
+#
+#===============================================================================
+
+
 import glob
 import numpy as np
 import argparse
 
 
-""" main fucntion
-"""
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--pathname', type=str, default='./dataset/images/*.jpg')
@@ -32,5 +45,4 @@ if __name__ == "__main__":
     # 4. Create a valid
     with open(valid_save, 'w') as f:
         for jj in valid: f.write(files[jj] + "\n")
-    
     
