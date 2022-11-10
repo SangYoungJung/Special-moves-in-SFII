@@ -1,5 +1,13 @@
-""" Import libraries
-""" 
+#===============================================================================
+#
+#   File name   : movesSF2_broadcast_yolo.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : Broadcsting with YOLO with video
+#
+#===============================================================================
+
+
 import os
 os.add_dll_directory(os.environ['CUDA_PATH'] + '/bin') # For darknet with CUDA
 os.add_dll_directory(os.getcwd())
@@ -21,8 +29,11 @@ import util.movesSF2_util_yolo as util_yolo
 import util.movesSF2_util_model as util_model
 
 
-""" Functions
-"""
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def main(args):
     # [[[ configuration for darknet
     random.seed(3)  # deterministic bbox colors
@@ -103,8 +114,11 @@ def main(args):
     cv2.destroyAllWindows()
 
 
-""" Main
-"""
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments

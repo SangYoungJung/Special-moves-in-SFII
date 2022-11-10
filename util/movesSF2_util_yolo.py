@@ -1,4 +1,14 @@
 
+#===============================================================================
+#
+#   File name   : movesSF2_util_yolo.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : General helpful functions for YOLO
+#
+#===============================================================================
+
+
 import darknet
 import darknet_images
 import cv2
@@ -55,3 +65,4 @@ def convert_original_frame(image, bbox, darkent_height, darknet_width):
 
     bbox_converted = (orig_x, orig_y, orig_width, orig_height)
     return bbox_converted
+

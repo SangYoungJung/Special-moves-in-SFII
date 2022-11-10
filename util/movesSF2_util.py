@@ -1,3 +1,13 @@
+#===============================================================================
+#
+#   File name   : movesSF2_util.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : General helpful functions
+#
+#===============================================================================
+
+
 import pickle
 import time
 import numpy as np
@@ -7,8 +17,11 @@ import cv2
 from PIL import Image, ImageOps
 
 
-""" Creation Functions
-"""
+#===============================================================================
+# Creation Functions
+#===============================================================================
+
+
 def creation_pickle(output, dataset_x, dataset_y, name_classes):
     dataset = dict()
     dataset['dataset_x'] = dataset_x
@@ -18,8 +31,11 @@ def creation_pickle(output, dataset_x, dataset_y, name_classes):
         pickle.dump(dataset, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-""" Load Functions
-"""
+#===============================================================================
+# Load Functions
+#===============================================================================
+
+
 def load_images(images, w=0, h=0, aug_horizontal = False, normalization = 1, gray_scale = False):
     images_list = []
     images_list_aug = []
@@ -33,8 +49,11 @@ def load_images(images, w=0, h=0, aug_horizontal = False, normalization = 1, gra
     return np.array(images_list) / normalization, np.array(images_list_aug) / normalization # Data Normalization
       
 
-""" Make Functions
-"""        
+#===============================================================================
+# Make Functions
+#===============================================================================
+
+
 def make_image_list(pathname):
     return sorted(glob.glob(pathname))
 
@@ -70,16 +89,22 @@ def make_time_series_data_x(images_ndarry, step):
     return dataset_x
 
 
-""" Image Processing
-"""
+#===============================================================================
+# Image Processing Functions
+#===============================================================================
+
+
 def pil_to_cv2(pil_image):
     numpy_image= np.array(pil_image)
     opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
     return opencv_image
 
 
-""" Util
-"""
+#===============================================================================
+# Information Functions
+#===============================================================================
+
+
 fps_start_time = time.time()
 fps_counter = 0
 def fps_show(per_second=1):
@@ -98,3 +123,4 @@ def video_information(vidcap):
     print('Frame count:', int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT)))
     print('FPS:',int(vidcap.get(cv2.CAP_PROP_FPS)))
     return int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+

@@ -1,5 +1,15 @@
+#===============================================================================
+#
+#   File name   : movesSF2_yolo_to_image.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : Detected object via YOLO to image sequence for RNN's data
+#
+#===============================================================================
+
+
 import os
-os.add_dll_directory('c:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/bin')
+os.add_dll_directory(os.environ['CUDA_PATH'] + '/bin') # For darknet with CUDA
 os.add_dll_directory(os.getcwd())
 
 import cv2
@@ -12,7 +22,17 @@ from datetime import datetime
 import util.movesSF2_util_yolo as util_yolo
 
 
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def main(args):
+    time_stamp = str(int(datetime.now().timestamp()))
+    args.output_location = args.output_location + "_" + time_stamp
+    try: os.makedirs(args.output_location)
+    except FileExistsError: pass
+    
     # [[[ configuration
     random.seed(3)  # deterministic bbox colors
     network, class_names, class_colors = darknet.load_network( args.config, args.data, args.weights, batch_size=1 )
@@ -53,6 +73,11 @@ def main(args):
     cv2.destroyAllWindows()
 
 
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
@@ -75,13 +100,13 @@ if __name__ == "__main__":
     parser.add_argument('--output_location',    dest='output_location',    type=str)
     # ]]]
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    """ Example
+    #""" Example
     args = parser.parse_args(['--video', './dataset/videos/ken_vs_zangief.mp4', 
                               '--output_detectons', 'True',
                               '--output_class', 'ken_a,zangief_a',
-                              '--output_location', './dataset/yolo_output'])
-    """
+                              '--output_location', './dataset/images_moves'])
+    #"""
     main(args)
 

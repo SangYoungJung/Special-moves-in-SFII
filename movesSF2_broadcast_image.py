@@ -1,5 +1,12 @@
-""" Import libraries
-""" 
+#===============================================================================
+#
+#   File name   : movesSF2_broadcast_image.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : Broadcsting with only prepared images
+#
+#===============================================================================
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -17,8 +24,11 @@ import util.movesSF2_util as util
 import util.movesSF2_util_model as util_model
 
 
-""" Functions
-"""
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def main(args):
     # [[[ load pre-trained model as movesSF2
     model, input_time_steps, input_image_size = util_model.load_model(args.model)
@@ -70,8 +80,11 @@ def main(args):
     cv2.destroyAllWindows()
 
 
-""" Main
-"""
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments

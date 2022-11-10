@@ -1,11 +1,24 @@
+#===============================================================================
+#
+#   File name   : movesSF2_time_series_data.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : Make time series dataset for RNNs 
+#
+#===============================================================================
+
+
 import glob
 import argparse
 import numpy as np
 import util.movesSF2_util as util
 
 
-""" main function
-"""
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def main(args):
     # Creation data array for moves info of each image
     images = sorted(glob.glob(args.input + '/*.jpg'))
@@ -42,6 +55,11 @@ def main(args):
     util.creation_pickle(args.output, dataset_x, dataset_y, dataset_class_name)
 
 
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments
@@ -50,8 +68,8 @@ if __name__ == "__main__":
     # ]]]
     
     # [[[ Ouput arguments
-    parser.add_argument('--output_width', dest='output_width', type=int, default=100)
-    parser.add_argument('--output_height', dest='output_height', type=int, default=100)
+    parser.add_argument('--output_width', dest='output_width', type=int, default=56)
+    parser.add_argument('--output_height', dest='output_height', type=int, default=56)
     parser.add_argument('--output_step', dest='output_step', type=int, default=10)
     parser.add_argument('--output_aug_horizontal', dest='output_aug_horizontal', type=lambda s : s in ['True'], default=False)
     parser.add_argument('--output', dest='output', type=str, required=True)

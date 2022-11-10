@@ -1,3 +1,13 @@
+#===============================================================================
+#
+#   File name   : movesSF2_time_series_data.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : video to image frames for YOLO training data and etc.
+#
+#===============================================================================
+
+
 import cv2
 import os
 import argparse
@@ -5,8 +15,11 @@ from datetime import datetime
 import util.movesSF2_util as util
 
 
-""" Functions
-"""
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def main(args):
     time_stamp = str(int(datetime.now().timestamp()))
     args.output_location = args.output_location + "_" + time_stamp
@@ -30,8 +43,11 @@ def main(args):
     cv2.destroyAllWindows()
 
 
-""" Main
-"""
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # [[[ Input arguments

@@ -1,3 +1,12 @@
+#===============================================================================
+#
+#   File name   : movesSF2_download_data.py
+#   Author      : lycobs@gmail.com
+#   Created date: 2022-10
+#   Description : Downloading and Preparing data
+#
+#===============================================================================
+
 
 import os
 import gdown
@@ -5,8 +14,11 @@ import zipfile
 import argparse
 
 
-""" download using gdown 
-"""
+#===============================================================================
+# Functions
+#===============================================================================
+
+
 def download(url, output, overwrite=False):
     if overwrite is False: 
         if os.path.isfile(output): return False
@@ -15,8 +27,7 @@ def download(url, output, overwrite=False):
     except: return False
     return True
 
-""" unzip
-"""
+
 def unzip(input, output, overwrite=False):
     if overwrite is False: 
         if os.path.isdir(output): return False
@@ -24,8 +35,11 @@ def unzip(input, output, overwrite=False):
     return True
     
 
-""" main fucntion
-"""
+#===============================================================================
+# Main
+#===============================================================================
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--directory', type=str, default='./dataset')
