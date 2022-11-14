@@ -46,6 +46,9 @@ First, YOLO detects characters of SF2 and feeds detected images to moves-RNN's. 
 * **movesSF2_yolo_to_image.py :** detected object via YOLO to image sequence for RNN's data
 * **movesSF2_time_series_data.py :**  make time series dataset for RNNs from detected image of YOLO
 
+###### Training
+* **movesSF2_model.ipynb :** recipe of moves recognition
+
 
 ### YOLO command line
 ###### Demo & Test
