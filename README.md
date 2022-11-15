@@ -1,5 +1,5 @@
 # Special moves SF2 recognition with YOLO + RNN
-[![moves SF2 recognition](https://i.imgur.com/hOkH8Kz.png)](https://youtu.be/S657M5LdDDQ=0s "moves SF2 recognition")  
+[![moves SF2 recognition](https://i.imgur.com/PPP18mR.gif)](https://youtu.be/S657M5LdDDQ=0s "moves SF2 recognition")  
 **Youtube Link :** [Special moves SF2 recognition with YOLO + RNN](https://youtu.be/S657M5LdDDQ=0s)  
 
 
