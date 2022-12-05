@@ -1,7 +1,12 @@
-# Special moves SF2 recognition with YOLO + RNN
-[![moves SF2 recognition](https://i.imgur.com/PPP18mR.gif)](https://youtu.be/S657M5LdDDQ=0s "moves SF2 recognition")  
-**Youtube Link :** [Special moves SF2 recognition with YOLO + RNN](https://youtu.be/S657M5LdDDQ=0s)  
+# In Progress
+More faster inference of RNNs models
+1. Reuse frames passed through RNNs.
+2. 1 frame input data only.
+3. Keep the previous output and new 1 frame is feeded.
 
+
+# Special moves SF2 recognition with YOLO + RNN 
+[![moves SF2 recognition](https://i.imgur.com/PPP18mR.gif)](https://youtu.be/S657M5LdDDQ=0s "moves SF2 recognition")  
 
 This is a broadcasting model and tiny tool for Street Fighter2.  
 First, YOLO detects characters of SF2 and feeds detected images to moves-RNN's. Second, moves-RNN's performs special moves SF2 recognition.  
