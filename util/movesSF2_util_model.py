@@ -43,6 +43,18 @@ def load_model(name):
     return model, input_time_steps, input_image_size
 
 
+def model_info(model):
+    space_length = 25
+    for idx, layer in enumerate(model.layers):
+        print("".ljust(space_length+5, '-'))
+        print("Layer:".ljust(space_length), idx)
+        print("weights:".ljust(space_length), len(layer.weights))
+        print("trainable_weights:".ljust(space_length), len(layer.trainable_weights))
+        print("non_trainable_weights:".ljust(space_length), len(layer.non_trainable_weights))
+        print("trainable:".ljust(space_length), layer.trainable)
+    print("".ljust(space_length+5, '-'))
+
+
 def inference(model, time_step_input):
     input = np.array(time_step_input) / 255              
     result = model.predict(np.expand_dims(input, axis=0))

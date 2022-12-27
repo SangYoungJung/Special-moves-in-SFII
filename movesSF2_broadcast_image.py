@@ -32,6 +32,8 @@ import util.movesSF2_util_model as util_model
 def main(args):
     # [[[ load pre-trained model as movesSF2
     model, input_time_steps, input_image_size = util_model.load_model(args.model)
+    util_model.model_info(model)
+    print(model.summary())
     # ]]]
     
     queue_crops = {}
@@ -76,6 +78,9 @@ def main(args):
         
         # Quit
         if cv2.waitKey(1) & 0xFF == ord('q'): break 
+        
+        # Show FPS
+        if args.print_fps: util.fps_show()
 
     cv2.destroyAllWindows()
 
@@ -98,6 +103,8 @@ if __name__ == "__main__":
     parser.add_argument('--model_class',        dest='model_class',        type=str)
     parser.add_argument('--inference_per_frame',dest='inference_per_frame',type=int, default=1)
     parser.add_argument('--judgement_time_step',dest='judgement_time_step',type=int, default=3)
+    parser.add_argument('--print_fps',          dest='print_fps',          type=lambda s : s in ['True'], default=True)
+
     # ]]]
     
     # args = parser.parse_args()
@@ -109,7 +116,8 @@ if __name__ == "__main__":
                               '--output_class', 'ken_a',
                               '--model_class', 'ken_a',
                               '--inference_per_frame', '1',
-                              '--judgement_time_step', '3'])
+                              '--judgement_time_step', '3',
+                              '--print_fps', 'True'])
     #"""
     main(args)
 
